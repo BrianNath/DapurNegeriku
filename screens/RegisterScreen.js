@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native'
+import { KeyboardAvoidingView, StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useState, useEffect } from 'react';
 import { auth, database } from '../firebase';
 import { ref, set } from "firebase/database";
@@ -20,9 +20,10 @@ const RegisterScreen = () => {
     const [phone, setPhone] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [loading, setLoading] = useState(false)
 
     const handleSignUp = () => {
-
+        setLoading(true)
         if (name.replace(/(\r\n|\n|\r)/gm, "") && phone.replace(/(\r\n|\n|\r)/gm, "") !== "") {
             set(ref(database, 'Users/' + unique), {
                 username: name,
@@ -39,6 +40,7 @@ const RegisterScreen = () => {
 
         auth
             .createUserWithEmailAndPassword(email, password)
+            .then(setLoading(true))
             .then(userCredentials => {
                 const user = userCredentials.user;
                 alert("Berhasil register");
@@ -66,6 +68,7 @@ const RegisterScreen = () => {
                     setEmail("");
                     setPassword("");
                 }
+                setLoading(false)
             })
     }
 
@@ -124,10 +127,12 @@ const RegisterScreen = () => {
                         onPress={handleSignUp}
                         style={[styles.button, styles.buttonOutline]}
                     >
-                        <Text style={styles.buttonOutlineText}>Register</Text>
+                        {loading ? <ActivityIndicator color="green" /> : <Text style={styles.buttonOutlineText}>Register</Text>}
                     </TouchableOpacity>
-                    <Text>Already have an account?</Text>
-                    <Text style={styles.linkText} onPress={() => navigation.replace("Login")}>Login</Text>
+                    <View style={{ width: 200, alignItems: "center" }}>
+                        <Text>Already have an account?</Text>
+                        <Text style={styles.linkText} onPress={() => navigation.replace("Login")}>Login</Text>
+                    </View>
                 </View>
             </KeyboardAvoidingView >
         </View>
