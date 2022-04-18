@@ -1,10 +1,10 @@
-import { KeyboardAvoidingView, StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native'
+import { KeyboardAvoidingView, StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { useState, useEffect } from 'react';
 import { auth } from '../firebase';
 import { useNavigation } from '@react-navigation/core';
 
 
-const FONTS = {
+const FONT = {
     color: '#79BF80',
     fontWeight: '700',
     fontSize: 16
@@ -14,69 +14,47 @@ const LoginScreen = () => {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-
-    const handleSignUp = () => {
-        auth
-            .createUserWithEmailAndPassword(email, password)
-            .then(userCredentials => {
-                const user = userCredentials.user
-                alert("Berhasil register")
-            }).catch(error => {
-                if (error.code === 'auth/email-already-in-use') {
-                    alert('Email sudah ada');
-                    setEmail("")
-                    setPassword("")
-                }
-
-                if (error.code === 'auth/invalid-email') {
-                    alert('Email tidak valid');
-                    setEmail("")
-                    setPassword("")
-                }
-
-                if (error.code === 'auth/weak-password') {
-                    alert('Perbaiki password')
-                    setPassword("")
-                }
-                else {
-                    alert(error.code)
-                    setEmail("")
-                    setPassword("")
-                }
-            })
-
-    }
+    const [loading, setLoading] = useState({
+        loadingLogin: false
+    })
 
     //Firebase: There is no user record corresponding to this identifier. The user may have been deleted. (auth/user-not-found).
     //Firebase: The password is invalid or the user does not have a password. (auth/wrong-password).
     //Firebase: The email address is badly formatted. (auth/invalid-email).
 
     const handleSignIn = () => {
-        auth
-            .signInWithEmailAndPassword(email, password)
-            .then(userCredentials => {
-                const user = userCredentials.user
-                alert("Berhasil Login", user.email)
-            })
-            .catch(error => {
-                if (error.code === 'There is no user record corresponding to this identifier. The user may have been deleted. (auth/user-not-found).') {
-                    alert('Email tidak terdaftar');
-                    setEmail("")
-                    setPassword("")
-                }
+        try {
+            setLoading({ loadingLogin: true })
+            auth
+                .signInWithEmailAndPassword(email, password)
+                .then(userCredentials => {
+                    const user = userCredentials.user
+                    alert("Berhasil Login", user.email)
+                })
+                .catch(error => {
+                    if (error.code === 'There is no user record corresponding to this identifier. The user may have been deleted. (auth/user-not-found).') {
+                        alert('Email tidak terdaftar');
+                        setEmail("")
+                        setPassword("")
+                    }
 
-                if (error.code === 'The password is invalid or the user does not have a password. (auth/wrong-password).') {
-                    alert('Password salah');
-                    setPassword("")
-                }
+                    if (error.code === 'The password is invalid or the user does not have a password. (auth/wrong-password).') {
+                        alert('Password salah');
+                        setPassword("")
+                    }
 
-                else {
-                    alert('Data tidak valid')
-                    setEmail("")
-                    setPassword("")
-                }
+                    else {
+                        alert('Terjadi Error')
+                        setEmail("")
+                        setPassword("")
+                    }
 
-            })
+                })
+            setLoading({ loadingLogin: true })
+        }
+        catch (error) {
+            alert(error)
+        }
     }
 
     const navigation = useNavigation()
@@ -113,23 +91,19 @@ const LoginScreen = () => {
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
                         onPress={handleSignIn}
-                        style={styles.button}
-                    >
-                        <Text style={styles.buttonText}>Login</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={handleSignUp}
                         style={[styles.button, styles.buttonOutline]}
                     >
-                        <Text style={styles.buttonOutlineText}>Register</Text>
+                        {loading ? <ActivityIndicator color="green" /> : <Text style={styles.buttonOutlineText}>Login</Text>}
                     </TouchableOpacity>
+                    <Text>Dont hanve any account?</Text>
+                    <Text style={styles.linkText} onPress={() => navigation.replace("Register")}>Register</Text>
                 </View>
             </KeyboardAvoidingView >
         </View>
     )
 }
 
-export default LoginScreen
+export default LoginScreen;
 
 const styles = StyleSheet.create({
     container: {
@@ -172,10 +146,13 @@ const styles = StyleSheet.create({
         borderWidth: 1
     },
     buttonOutlineText: {
-        ...FONTS
+        ...FONT
     },
     buttonText: {
-        ...FONTS,
+        ...FONT,
         color: 'white'
+    },
+    linkText: {
+        ...FONT,
     }
 })
