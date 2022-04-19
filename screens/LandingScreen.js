@@ -2,6 +2,10 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { FONTS, COLORS } from "../constant";
 import { useNavigation } from "@react-navigation/core";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 const LandingScreen = () => {
   const navigation = useNavigation();
@@ -18,7 +22,7 @@ const LandingScreen = () => {
       {show ? (
         <Image
           source={require("../assets/images/loading.gif")}
-          style={{ width: "10.2%", height: "6%", margin: 14 }}
+          style={{ width: wp("10.2%"), height: hp("6%"), margin: 14 }}
         />
       ) : (
         <TouchableOpacity
@@ -40,8 +44,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logo: {
-    width: "45%",
-    height: "35%",
+    width: wp("45%"),
+    height: hp("35%"),
   },
   slogan: {
     ...FONTS.regular_green,
@@ -49,7 +53,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: COLORS.primary,
-    width: "40%",
+    width: wp("40%"),
     padding: 10,
     borderRadius: 30,
     alignItems: "center",
