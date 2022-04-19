@@ -61,13 +61,7 @@ const RegisterScreen = () => {
                     alert('Perbaiki password')
                     setPassword("");
                 }
-                else {
-                    alert('Maaf terjadi error')
-                    setName("");
-                    setPhone("");
-                    setEmail("");
-                    setPassword("");
-                }
+
                 setLoading(false)
             })
     }

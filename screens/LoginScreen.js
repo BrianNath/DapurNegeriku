@@ -30,28 +30,23 @@ const LoginScreen = () => {
                 alert("Berhasil Login", user.email)
             })
             .catch(error => {
-                if (error.code === 'There is no user record corresponding to this identifier. The user may have been deleted. (auth/user-not-found).') {
+                if (error.code === '(auth/user-not-found).') {
                     alert('Email tidak terdaftar');
                     setEmail("")
                     setPassword("")
                 }
 
-                if (error.code === 'The password is invalid or the user does not have a password. (auth/wrong-password).') {
+                if (error.code === '(auth/wrong-password)') {
                     alert('Password salah');
                     setPassword("")
                 }
 
-                if (email === "" && password === "") {
-                    alert('Field tidak boleh kosong');
+                if (error.code === 'auth/invalid-email') {
+                    alert('Email tidak valid');
+                    setEmail("");
+                    setPassword("");
                 }
 
-                if (password === "") {
-                    alert('Silahkan isi field password');
-                }
-
-                if (email === "") {
-                    alert('Silahkan isi field email');
-                }
                 setLoading(false)
             })
 
