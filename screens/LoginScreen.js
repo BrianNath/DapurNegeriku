@@ -1,67 +1,95 @@
-import { KeyboardAvoidingView, StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native'
-import React, { useState, useEffect } from 'react';
-import { auth } from '../firebase';
-import { useNavigation } from '@react-navigation/core';
+import {
+    KeyboardAvoidingView,
+    StyleSheet,
+    Text,
+    View,
+    TextInput,
+    TouchableOpacity,
+    ActivityIndicator,
+} from "react-native";
+import React, { useState, useEffect } from "react";
+import { auth, database } from "../firebase";
+import { ref, set } from "firebase/database";
+import { useNavigation } from "@react-navigation/core";
+import uuid from "react-native-uuid";
 
+const FONTS = {
+    color: "#79BF80",
+    fontWeight: "700",
+    fontSize: 16,
+};
 
-const FONT = {
-    color: '#79BF80',
-    fontWeight: '700',
-    fontSize: 16
-}
+const unique = uuid.v1();
 
-const LoginScreen = () => {
+const RegisterScreen = () => {
+    const [name, setName] = useState("");
+    const [phone, setPhone] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const [loading, setLoading] = useState(false)
-    //Firebase: There is no user record corresponding to this identifier. The user may have been deleted. (auth/user-not-found).
-    //Firebase: The password is invalid or the user does not have a password. (auth/wrong-password).
-    //Firebase: The email address is badly formatted. (auth/invalid-email).
+    const handleSignUp = () => {
+        setLoading(true);
+        if (
+            name.replace(/(\r\n|\n|\r)/gm, "") &&
+            phone.replace(/(\r\n|\n|\r)/gm, "") !== ""
+        ) {
+            set(ref(database, "Users/" + unique), {
+                username: name,
+                email: email,
+                phoneNumber: phone,
+            }).catch((error) => {
+                alert("Field tidak valid");
+                setPhone("");
+                setName("");
+                setEmail("");
+                setPassword("");
+            });
+        }
 
-    const handleSignIn = () => {
         auth
-            .signInWithEmailAndPassword(email, password)
-            .then(
-                setLoading(true)
-            )
-            .then(userCredentials => {
-                const user = userCredentials.user
-                alert("Berhasil Login", user.email)
+            .createUserWithEmailAndPassword(email, password)
+            .then(setLoading(true))
+            .then((userCredentials) => {
+                const user = userCredentials.user;
+                alert("Berhasil register");
             })
-            .catch(error => {
-                if (error.code === '(auth/user-not-found).') {
-                    alert('Email tidak terdaftar');
-                    setEmail("")
-                    setPassword("")
-                }
-
-                if (error.code === '(auth/wrong-password)') {
-                    alert('Password salah');
-                    setPassword("")
-                }
-
-                if (error.code === 'auth/invalid-email') {
-                    alert('Email tidak valid');
+            .catch((error) => {
+                if (error.code === "auth/email-already-in-use") {
+                    alert("Email sudah ada");
                     setEmail("");
                     setPassword("");
                 }
 
-                setLoading(false)
-            })
+                if (error.code === "auth/invalid-email") {
+                    alert("Email tidak valid");
+                    setEmail("");
+                    setPassword("");
+                }
 
-    }
+                if (error.code === "auth/weak-password") {
+                    alert("Perbaiki password");
+                    setPassword("");
+                }
 
-    const navigation = useNavigation()
+                setLoading(false);
+            });
+    };
+
+    //Firebase: There is no user record corresponding to this identifier. The user may have been deleted. (auth/user-not-found).
+    //Firebase: The password is invalid or the user does not have a password. (auth/wrong-password).
+    //Firebase: The email address is badly formatted. (auth/invalid-email).
+
+    const navigation = useNavigation();
 
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user) {
-                navigation.replace("Home")
+                navigation.replace("Login");
             }
-        })
-        return unsubscribe
-    }, [])
+        });
+        return unsubscribe;
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -70,85 +98,109 @@ const LoginScreen = () => {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
             >
                 <TextInput
-                    placeholder='Email'
+                    placeholder="Username"
+                    value={name}
+                    onChangeText={(text) => setName(text)}
+                    style={styles.input}
+                    maxLength={20}
+                />
+                <TextInput
+                    style={styles.input}
+                    maxLength={13}
+                    onChangeText={(text) => setPhone(text.replace(/\D/g, ""))}
+                    value={phone}
+                    placeholder="Phone"
+                    keyboardType="numeric"
+                />
+                <TextInput
+                    placeholder="Email"
                     value={email}
-                    onChangeText={text => setEmail(text)}
+                    onChangeText={(text) => setEmail(text)}
                     style={styles.input}
                 />
                 <TextInput
-                    placeholder='Password'
+                    placeholder="Password"
                     value={password}
-                    onChangeText={text => setPassword(text)}
+                    onChangeText={(text) => setPassword(text)}
                     style={styles.input}
                     secureTextEntry
                 />
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
-                        onPress={handleSignIn}
+                        onPress={handleSignUp}
                         style={[styles.button, styles.buttonOutline]}
                     >
-                        {loading ? <ActivityIndicator color="green" /> : <Text style={styles.buttonOutlineText}>Login</Text>}
+                        {loading ? (
+                            <ActivityIndicator color="green" />
+                        ) : (
+                            <Text style={styles.buttonOutlineText}>Register</Text>
+                        )}
                     </TouchableOpacity>
                     <View style={{ width: 200, alignItems: "center" }}>
-                        <Text>Dont hanve any account?</Text>
-                        <Text style={styles.linkText} onPress={() => navigation.replace("Register")}>Register</Text>
+                        <Text>Already have an account?</Text>
+                        <Text
+                            style={styles.linkText}
+                            onPress={() => navigation.replace("Login")}
+                        >
+                            Login
+                        </Text>
                     </View>
                 </View>
-            </KeyboardAvoidingView >
+            </KeyboardAvoidingView>
         </View>
-    )
-}
+    );
+};
 
-export default LoginScreen;
+export default RegisterScreen;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
+        justifyContent: "center",
+        alignItems: "center",
     },
     inputContainer: {
-        width: '80%',
-        alignItems: 'center'
+        width: "80%",
+        alignItems: "center",
     },
     input: {
-        width: '90%',
+        width: "90%",
         height: 50,
-        backgroundColor: 'white',
+        backgroundColor: "white",
         paddingHorizontal: 15,
         paddingVertical: 10,
         borderRadius: 15,
         marginTop: 5,
         fontSize: 16,
-        color: '#79BF80'
+        color: "#79BF80",
     },
     buttonContainer: {
-        width: '60%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 40
+        width: "60%",
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 40,
     },
     button: {
-        backgroundColor: '#79BF80',
-        width: '100%',
+        backgroundColor: "#79BF80",
+        width: "100%",
         padding: 15,
         borderRadius: 15,
-        alignItems: 'center'
+        alignItems: "center",
     },
     buttonOutline: {
-        backgroundColor: 'white',
+        backgroundColor: "white",
         marginTop: 5,
-        borderColor: '#79BF80',
-        borderWidth: 1
+        borderColor: "#79BF80",
+        borderWidth: 1,
     },
     buttonOutlineText: {
-        ...FONT
+        ...FONTS,
     },
     buttonText: {
-        ...FONT,
-        color: 'white'
+        ...FONTS,
+        color: "white",
     },
     linkText: {
-        ...FONT,
-    }
-})
+        ...FONTS,
+    },
+});

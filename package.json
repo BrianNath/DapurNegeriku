@@ -22,6 +22,7 @@
     "react-native": "0.64.3",
     "react-native-global-props": "^1.1.5",
     "react-native-phone-number-input": "^2.1.0",
+    "react-native-responsive-screen": "^1.4.2",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.10.1",
     "react-native-uuid": "^2.0.1",
@@ -31,5 +32,8 @@
   "devDependencies": {
     "@babel/core": "^7.12.9"
   },
-  "private": true
+  "private": true,
+  "repository": "https://github.com/BrianNath/DapurNegeriku.git",
+  "author": "BrianNath <comonlegend123@gmail.com>",
+  "license": "MIT"
 }

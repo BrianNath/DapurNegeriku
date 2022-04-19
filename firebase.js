@@ -9,8 +9,8 @@ const firebaseConfig = {
     storageBucket: "dapurnegeriku.appspot.com",
     messagingSenderId: "331704734990",
     appId: "1:331704734990:web:d699e9c22122fa74c3335f"
-  };
-  
+};
+
 // Initialize Firebase
 let app;
 if (firebase.apps.length === 0) {
