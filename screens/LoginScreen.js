@@ -62,6 +62,7 @@ const LoginScreen = () => {
         })
         return unsubscribe
     }, [])
+
     return (
         <View style={styles.container}>
             <KeyboardAvoidingView
