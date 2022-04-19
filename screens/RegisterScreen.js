@@ -88,7 +88,7 @@ const RegisterScreen = () => {
                 navigation.replace("Login");
             }
         });
-        return unsubscribe;
+        return () => unsubscribe();
     }, []);
 
     return (
