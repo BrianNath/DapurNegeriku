@@ -1,28 +1,17 @@
-<<<<<<< HEAD
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { RegisterScreen, HomeScreen, LoginScreen } from "./screens";
+import {
+  RegisterScreen,
+  HomeScreen,
+  LoginScreen,
+  LandingScreen,
+} from "./screens";
 import { LogBox } from "react-native";
 import { useFonts } from "expo-font";
 import AppLoading from "expo-app-loading";
-import {
-  setCustomText,
-  setCustomTextInput,
-  setCustomTouchableOpacity,
-} from "react-native-global-props";
-=======
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { RegisterScreen, HomeScreen, LoginScreen, LandingScreen } from "./screens";
-import { LogBox } from 'react-native';
-import { useFonts } from 'expo-font';
-import AppLoading from 'expo-app-loading';
-import { setCustomText, setCustomTextInput } from 'react-native-global-props';
->>>>>>> 39d89684803b72bb9f658b1846f56687d6907b3e
+import { setCustomText, setCustomTextInput } from "react-native-global-props";
 
 //Time error handler
 LogBox.ignoreLogs(["Setting a timer"]);
@@ -31,10 +20,6 @@ LogBox.ignoreLogs(["Setting a timer"]);
 //Stack Navitor
 const Stack = createNativeStackNavigator();
 //
-<<<<<<< HEAD
-
-=======
->>>>>>> 39d89684803b72bb9f658b1846f56687d6907b3e
 export default function App() {
   let [fontsLoaded] = useFonts({
     "Poppins-Bold": require("./assets/fonts/Poppins-Bold.ttf"),
@@ -58,7 +43,11 @@ export default function App() {
     return (
       <NavigationContainer>
         <Stack.Navigator>
-          <Stack.Screen options={{ headerShown: false }} name="Landing" component={LandingScreen} />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Landing"
+            component={LandingScreen}
+          />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen
@@ -80,4 +69,3 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-

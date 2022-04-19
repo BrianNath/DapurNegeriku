@@ -8,80 +8,110 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { auth } from "../firebase";
+import { auth, database } from "../firebase";
+import { ref, set } from "firebase/database";
 import { useNavigation } from "@react-navigation/core";
+import uuid from "react-native-uuid";
 
-const FONT = {
+const FONTS = {
   color: "#79BF80",
   fontWeight: "700",
   fontSize: 16,
 };
 
-const LoginScreen = () => {
+const unique = uuid.v1();
+
+const RegisterScreen = () => {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  //Firebase: There is no user record corresponding to this identifier. The user may have been deleted. (auth/user-not-found).
-  //Firebase: The password is invalid or the user does not have a password. (auth/wrong-password).
-  //Firebase: The email address is badly formatted. (auth/invalid-email).
 
-  const handleSignIn = () => {
+  const handleSignUp = () => {
+    setLoading(true);
+    if (
+      name.replace(/(\r\n|\n|\r)/gm, "") &&
+      phone.replace(/(\r\n|\n|\r)/gm, "") !== ""
+    ) {
+      set(ref(database, "Users/" + unique), {
+        username: name,
+        email: email,
+        phoneNumber: phone,
+      }).catch((error) => {
+        alert("Field tidak valid");
+        setPhone("");
+        setName("");
+        setEmail("");
+        setPassword("");
+      });
+    }
+
     auth
-      .signInWithEmailAndPassword(email, password)
+      .createUserWithEmailAndPassword(email, password)
       .then(setLoading(true))
       .then((userCredentials) => {
         const user = userCredentials.user;
-        alert("Berhasil Login", user.email);
+        alert("Berhasil register");
       })
       .catch((error) => {
-        if (
-          error.code ===
-          "There is no user record corresponding to this identifier. The user may have been deleted. (auth/user-not-found)."
-        ) {
-          alert("Email tidak terdaftar");
+        if (error.code === "auth/email-already-in-use") {
+          alert("Email sudah ada");
           setEmail("");
           setPassword("");
         }
 
-        if (
-          error.code ===
-          "The password is invalid or the user does not have a password. (auth/wrong-password)."
-        ) {
-          alert("Password salah");
+        if (error.code === "auth/invalid-email") {
+          alert("Email tidak valid");
+          setEmail("");
           setPassword("");
         }
 
-        if (email === "" && password === "") {
-          alert("Field tidak boleh kosong");
+        if (error.code === "auth/weak-password") {
+          alert("Perbaiki password");
+          setPassword("");
         }
 
-        if (password === "") {
-          alert("Silahkan isi field password");
-        }
-
-        if (email === "") {
-          alert("Silahkan isi field email");
-        }
         setLoading(false);
       });
   };
+
+  //Firebase: There is no user record corresponding to this identifier. The user may have been deleted. (auth/user-not-found).
+  //Firebase: The password is invalid or the user does not have a password. (auth/wrong-password).
+  //Firebase: The email address is badly formatted. (auth/invalid-email).
 
   const navigation = useNavigation();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        navigation.replace("Home");
+        navigation.replace("Login");
       }
     });
     return unsubscribe;
   }, []);
+
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView
         style={styles.inputContainer}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
+        <TextInput
+          placeholder="Username"
+          value={name}
+          onChangeText={(text) => setName(text)}
+          style={styles.input}
+          maxLength={20}
+        />
+        <TextInput
+          style={styles.input}
+          maxLength={13}
+          onChangeText={(text) => setPhone(text.replace(/\D/g, ""))}
+          value={phone}
+          placeholder="Phone"
+          keyboardType="numeric"
+        />
         <TextInput
           placeholder="Email"
           value={email}
@@ -97,22 +127,22 @@ const LoginScreen = () => {
         />
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            onPress={handleSignIn}
+            onPress={handleSignUp}
             style={[styles.button, styles.buttonOutline]}
           >
             {loading ? (
               <ActivityIndicator color="green" />
             ) : (
-              <Text style={styles.buttonOutlineText}>Login</Text>
+              <Text style={styles.buttonOutlineText}>Register</Text>
             )}
           </TouchableOpacity>
           <View style={{ width: 200, alignItems: "center" }}>
-            <Text>Dont hanve any account?</Text>
+            <Text>Already have an account?</Text>
             <Text
               style={styles.linkText}
-              onPress={() => navigation.replace("Register")}
+              onPress={() => navigation.replace("Login")}
             >
-              Register
+              Login
             </Text>
           </View>
         </View>
@@ -121,7 +151,7 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default RegisterScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -164,13 +194,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   buttonOutlineText: {
-    ...FONT,
+    ...FONTS,
   },
   buttonText: {
-    ...FONT,
+    ...FONTS,
     color: "white",
   },
   linkText: {
-    ...FONT,
+    ...FONTS,
   },
 });
