@@ -7,7 +7,7 @@ const LandingScreen = () => {
   const navigation = useNavigation();
 
   const [show, setShow] = useState(true);
-  setTimeout(() => setShow(false), 5000);
+  setTimeout(() => setShow(false), 4000);
   return (
     <View style={styles.container}>
       <Image
@@ -18,7 +18,7 @@ const LandingScreen = () => {
       {show ? (
         <Image
           source={require("../assets/images/loading.gif")}
-          style={{ width: "10%", height: "6%", margin: 14 }}
+          style={{ width: "10.2%", height: "6%", margin: 14 }}
         />
       ) : (
         <TouchableOpacity
