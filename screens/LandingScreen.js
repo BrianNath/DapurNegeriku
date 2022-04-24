@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FONTS, COLORS } from "../constant";
 import { useNavigation } from "@react-navigation/core";
 import {
@@ -11,7 +11,18 @@ const LandingScreen = () => {
     const navigation = useNavigation();
 
     const [show, setShow] = useState(true);
-    setTimeout(() => setShow(false), 4000);
+    const mounted = useRef(false)
+
+    setTimeout(() => {
+        if (mounted.current) setShow(false)
+    }, 4000);
+
+    useEffect(() => {
+        mounted.current = true;
+
+        return () => mounted.current = false;
+    })
+
     return (
         <View style={styles.container}>
             <Image
@@ -26,7 +37,7 @@ const LandingScreen = () => {
                 />
             ) : (
                 <TouchableOpacity
-                    onPress={() => navigation.replace("Login")}
+                    onPress={() => navigation.navigate("Login")}
                     style={styles.button}
                 >
                     <Text style={{ ...FONTS.regular_white }}>Get Started</Text>

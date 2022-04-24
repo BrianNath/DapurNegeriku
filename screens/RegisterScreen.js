@@ -6,22 +6,22 @@ import {
     TextInput,
     TouchableOpacity,
     ActivityIndicator,
+    Image
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { auth, database } from "../firebase";
 import { ref, set } from "firebase/database";
 import { useNavigation } from "@react-navigation/core";
 import uuid from "react-native-uuid";
+import {
+    widthPercentageToDP as wp,
+    heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import { FONTS, COLORS } from "../constant";
 
-const FONTS = {
-    color: "#79BF80",
-    fontWeight: "700",
-    fontSize: 16,
-};
-
-const unique = uuid.v1();
 
 const RegisterScreen = () => {
+    const unique = uuid.v1();
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
@@ -94,59 +94,65 @@ const RegisterScreen = () => {
     return (
         <View style={styles.container}>
             <KeyboardAvoidingView
-                style={styles.inputContainer}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
             >
-                <TextInput
-                    placeholder="Username"
-                    value={name}
-                    onChangeText={(text) => setName(text)}
-                    style={styles.input}
-                    maxLength={20}
-                />
-                <TextInput
-                    style={styles.input}
-                    maxLength={13}
-                    onChangeText={(text) => setPhone(text.replace(/\D/g, ""))}
-                    value={phone}
-                    placeholder="Phone"
-                    keyboardType="numeric"
-                />
-                <TextInput
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={(text) => setEmail(text)}
-                    style={styles.input}
-                />
-                <TextInput
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={(text) => setPassword(text)}
-                    style={styles.input}
-                    secureTextEntry
-                />
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                        onPress={handleSignUp}
-                        style={[styles.button, styles.buttonOutline]}
-                    >
-                        {loading ? (
-                            <ActivityIndicator color="green" />
-                        ) : (
-                            <Text style={styles.buttonOutlineText}>Register</Text>
-                        )}
-                    </TouchableOpacity>
-                    <View style={{ width: 200, alignItems: "center" }}>
-                        <Text>Already have an account?</Text>
-                        <Text
-                            style={styles.linkText}
-                            onPress={() => navigation.replace("Login")}
-                        >
-                            Login
-                        </Text>
+                <View style={{ justifyContent: 'center', alignItems: 'center', }}>
+                    <Image source={require('../assets/images/logoNoBG.png')} style={styles.image} />
+                    <View style={styles.border}>
+                        <View style={styles.header}>
+                            <TouchableOpacity onPress={() => navigation.replace("Login")}>
+                                <Text style={{ ...FONTS.regular_grey }}>Sign In</Text>
+                            </TouchableOpacity>
+                            <Text style={{ borderBottomWidth: 2, borderBottomColor: COLORS.primary, ...FONTS.regular_green }} >Sign Up</Text>
+                        </View>
+                        <View>
+                            <TextInput
+                                placeholder='Enter your Username'
+                                value={name}
+                                onChangeText={text => setName(text)}
+                                style={styles.input}
+                                secureTextEntry
+                            />
+                            <TextInput
+                                style={styles.input}
+                                maxLength={13}
+                                onChangeText={(text) => setPhone(text.replace(/\D/g, ""))}
+                                value={phone}
+                                placeholder="Phone"
+                                keyboardType="numeric"
+                            />
+                            <TextInput
+                                placeholder='Enter your Email Adress'
+                                value={email}
+                                onChangeText={text => setEmail(text)}
+                                style={styles.input}
+                            />
+                            <TextInput
+                                placeholder='Enter your Password'
+                                value={password}
+                                onChangeText={text => setPassword(text)}
+                                style={[styles.input, { marginBottom: hp(10) }]}
+                                secureTextEntry
+                            />
+                        </View>
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', bottom: hp(4) }}>
+                            <TouchableOpacity style={styles.button}>
+                                {loading ? (
+                                    <ActivityIndicator color="white" />
+                                ) : (
+                                    <Text style={{ ...FONTS.regular_white, fontSize: 16 }} onPress={handleSignUp}>Sign Up</Text>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.signup}>
+                            <Text style={{ ...FONTS.regular_grey }}>or</Text>
+                            <TouchableOpacity onPress={() => navigation.replace("Login")}>
+                                <Text style={{ ...FONTS.regular_green, paddingLeft: 3 }}>Sign In</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
-            </KeyboardAvoidingView>
+            </KeyboardAvoidingView >
         </View>
     );
 };
@@ -156,51 +162,102 @@ export default RegisterScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    inputContainer: {
-        width: "80%",
-        alignItems: "center",
+    image: {
+        width: wp(28),
+        height: hp(25),
+        bottom: hp(10)
+    },
+    border: {
+        backgroundColor: "white",
+        width: wp("70%"),
+        justifyContent: 'center',
+        borderRadius: 20,
+        padding: 10,
+        bottom: hp(9)
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly'
     },
     input: {
-        width: "90%",
-        height: 50,
-        backgroundColor: "white",
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        borderRadius: 15,
-        marginTop: 5,
-        fontSize: 16,
-        color: "#79BF80",
-    },
-    buttonContainer: {
-        width: "60%",
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 40,
+        margin: 20,
+        borderBottomColor: COLORS.green,
+        borderBottomWidth: 1,
+        ...FONTS.regular_green,
+        marginBottom: 0,
+        paddingLeft: wp(2),
     },
     button: {
-        backgroundColor: "#79BF80",
-        width: "100%",
-        padding: 15,
-        borderRadius: 15,
-        alignItems: "center",
+        backgroundColor: COLORS.primary,
+        width: wp("40%"),
+        height: hp(5),
+        borderRadius: 30,
+        alignItems: 'center',
+        justifyContent: 'space-evenly',
     },
-    buttonOutline: {
-        backgroundColor: "white",
-        marginTop: 5,
-        borderColor: "#79BF80",
-        borderWidth: 1,
-    },
-    buttonOutlineText: {
-        ...FONTS,
-    },
-    buttonText: {
-        ...FONTS,
-        color: "white",
-    },
-    linkText: {
-        ...FONTS,
-    },
+    signup: {
+        flexDirection: 'row',
+        justifyContent: 'center'
+    }
 });
+
+
+{/* <View style={styles.container}>
+<KeyboardAvoidingView
+    style={styles.inputContainer}
+    behavior={Platform.OS === "ios" ? "padding" : "height"}
+>
+    <TextInput
+        placeholder="Username"
+        value={name}
+        onChangeText={(text) => setName(text)}
+        style={styles.input}
+        maxLength={20}
+    />
+    <TextInput
+        style={styles.input}
+        maxLength={13}
+        onChangeText={(text) => setPhone(text.replace(/\D/g, ""))}
+        value={phone}
+        placeholder="Phone"
+        keyboardType="numeric"
+    />
+    <TextInput
+        placeholder="Email"
+        value={email}
+        onChangeText={(text) => setEmail(text)}
+        style={styles.input}
+    />
+    <TextInput
+        placeholder="Password"
+        value={password}
+        onChangeText={(text) => setPassword(text)}
+        style={styles.input}
+        secureTextEntry
+    />
+    <View style={styles.buttonContainer}>
+        <TouchableOpacity
+            onPress={handleSignUp}
+            style={[styles.button, styles.buttonOutline]}
+        >
+            {loading ? (
+                <ActivityIndicator color="green" />
+            ) : (
+                <Text style={styles.buttonOutlineText}>Register</Text>
+            )}
+        </TouchableOpacity>
+        <View style={{ width: 200, alignItems: "center" }}>
+            <Text>Already have an account?</Text>
+            <Text
+                style={styles.linkText}
+                onPress={() => navigation.replace("Login")}
+            >
+                Login
+            </Text>
+        </View>
+    </View>
+</KeyboardAvoidingView>
+</View> */}
