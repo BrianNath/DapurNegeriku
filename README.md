@@ -2,7 +2,7 @@
 Welcome to my mobile app application source code
 
 ## Instalation
-````bash
+````node
 npm install
 ````
 
