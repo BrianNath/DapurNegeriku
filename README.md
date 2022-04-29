@@ -1,12 +1,12 @@
 # DapurNegeriku
 Welcome to my mobile app application source code
 
-##Instalation
+## Instalation
 ````bash
 npm install
 ````
 
-##features
+## features
 
 Firebase Auth
 Firebase RealtimeDatabase
