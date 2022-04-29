@@ -11,7 +11,7 @@ const COLORS = {
   primary: "#4C5F20",
   primary_light: "#6E8733",
   secondary: "#ABABAB",
-  secondary_ligt: "#D7D7D7",
+  secondary_light: "#D7D7D7",
   danger: "#FF3850",
   warning: "#FFBB33",
 };
